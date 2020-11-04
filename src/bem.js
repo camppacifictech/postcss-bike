@@ -1,25 +1,22 @@
-export const BEM = (block) => (elem, mods, options) => {
+export const BEM = (block) => (elems, mods, options) => {
   const template = require('lodash.template');
   let data = { block };
   let formatter = template(options.blockFormat);
   let base = formatter(data);
 
-  if (!elem) {
-    return base;
-  }
+  base = (elems ? Object.entries(elems).reduce((target, [key, value]) => {
+    if (!value) {
+      return target;
+    }
 
-  if (typeof elem === 'object') {
-    mods = elem;
-    elem = '';
-  }
+    data = { base, key, value };
+    formatter = value === true ? template(options.elementFormatTrue) : template(options.elementFormat);
+    target += formatter(data);
 
-  if (elem !== '') {
-    data = { block, elem };
-    formatter = template(options.elementFormat);
-    base = formatter(data);
-  }
+    return target;
+  }, '') : base);
 
-  return (mods ? Object.entries(mods).reduce((target, [key, value]) => {
+  base = (mods ? Object.entries(mods).reduce((target, [key, value]) => {
     if (!value) {
       return target;
     }
@@ -30,4 +27,6 @@ export const BEM = (block) => (elem, mods, options) => {
 
     return target;
   }, '') : base);
+
+  return base;
 };
