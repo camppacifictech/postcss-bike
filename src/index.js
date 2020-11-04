@@ -14,7 +14,7 @@ const DEFAULT_OPTIONS = {
   contextFormatTrue: '${base}_${key}'
 };
 
-export default postcss.plugin('postcss-bike', (options = DEFAULT_OPTIONS) => {
+export default (options = DEFAULT_OPTIONS) => {
   options = Object.assign({}, DEFAULT_OPTIONS, options);
 
   return (root) => {
@@ -94,4 +94,5 @@ export default postcss.plugin('postcss-bike', (options = DEFAULT_OPTIONS) => {
 
     root.walkAtRules(options.component, process);
   };
-})
+}
+module.exports.postcss = true
