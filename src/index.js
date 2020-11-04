@@ -3,15 +3,15 @@ import { BEM } from './bem';
 
 const DEFAULT_OPTIONS = {
   component: 'component',
-  element: 'elem',
-  modifier: 'mod',
-  elementRegExp: /([\w\-]+)(?:\[([\w\-]+)\])?/,
-  modifierRegExp: /([\w\-]+)(?:\[([\w\-]+)\])?/,
+  variant: 'variant',
+  context: 'context',
+  variantRegExp: /([\w\-]+)(?:\[([\w\-]+)\])?/,
+  contextRegExp: /([\w\-]+)(?:\[([\w\-]+)\])?/,
   blockFormat: '.${block}',
-  elementFormat: '.${base}__${key}_${value}',
-  elementFormatTrue: '.${base}__${key}',
-  modifierFormat: '${base}_${key}_${value}',
-  modifierFormatTrue: '${base}_${key}'
+  variantFormat: '.${base}__${key}_${value}',
+  variantFormatTrue: '.${base}__${key}',
+  contextFormat: '${base}_${key}_${value}',
+  contextFormatTrue: '${base}_${key}'
 };
 
 export default postcss.plugin('postcss-bike', (options = DEFAULT_OPTIONS) => {
@@ -33,25 +33,25 @@ export default postcss.plugin('postcss-bike', (options = DEFAULT_OPTIONS) => {
         case options.component:
           selector = node.metadata.bem(null, null, options);
           break;
-        case options.modifier:
-          let [, modName, modVal = true] = node.metadata.name.match(options.modifierRegExp);
+        case options.context:
+          let [, contextName, contextVal = true] = node.metadata.name.match(options.contextRegExp);
 
-          node.metadata.mods = { [modName]: modVal };
-          if (node.parent.metadata.type === options.modifier) {
-            node.metadata.mods = { ...node.parent.metadata.mods, ...node.metadata.mods };
+          node.metadata.contexts = { [contextName]: contextVal };
+          if (node.parent.metadata.type === options.context) {
+            node.metadata.contexts = { ...node.parent.metadata.contexts, ...node.metadata.contexts };
           }
 
-          selector = node.metadata.bem(node.parent.metadata.elems, node.metadata.mods, options);
+          selector = node.metadata.bem(node.parent.metadata.variants, node.metadata.contexts, options);
           break;
-        case options.element:
-          let [, elemName, elemVal = true] = node.metadata.name.match(options.elementRegExp);
+        case options.variant:
+          let [, variantName, variantVal = true] = node.metadata.name.match(options.variantRegExp);
 
-          node.metadata.elems = { [elemName]: elemVal };
-          if (node.parent.metadata.type === options.element) {
-            node.metadata.elems = { ...node.parent.metadata.elems, ...node.metadata.elems };
+          node.metadata.variants = { [variantName]: variantVal };
+          if (node.parent.metadata.type === options.variant) {
+            node.metadata.variants = { ...node.parent.metadata.variants, ...node.metadata.variants };
           }
 
-          selector = node.metadata.bem(node.metadata.elems, node.parent.metadata.mods, options);
+          selector = node.metadata.bem(node.metadata.variants, node.parent.metadata.contexts, options);
           break;
       }
 
@@ -78,7 +78,7 @@ export default postcss.plugin('postcss-bike', (options = DEFAULT_OPTIONS) => {
       root.append(rule);
 
       rule.walkAtRules(child => {
-        if (![options.element, options.modifier].includes(child.name)) {
+        if (![options.variant, options.context].includes(child.name)) {
           return;
         }
 
