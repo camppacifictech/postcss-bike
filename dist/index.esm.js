@@ -46,7 +46,7 @@ const DEFAULT_OPTIONS = {
   contextFormatTrue: '${base}_${key}'
 };
 
-var index = postcss.plugin('postcss-bike', (options = DEFAULT_OPTIONS) => {
+var index = (options = DEFAULT_OPTIONS) => {
   options = Object.assign({}, DEFAULT_OPTIONS, options);
 
   return (root) => {
@@ -126,6 +126,7 @@ var index = postcss.plugin('postcss-bike', (options = DEFAULT_OPTIONS) => {
 
     root.walkAtRules(options.component, process);
   };
-});
+};
+module.exports.postcss = true;
 
 export default index;
